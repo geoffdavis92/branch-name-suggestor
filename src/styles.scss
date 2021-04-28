@@ -1,0 +1,121 @@
+$error: #cd2233;
+$success: green;
+$warning: darkorange;
+
+@function variant($color, $step) {
+  $min-step: -9;
+  $max-step: 9;
+  $mix-color: #fff;
+
+  @if $step < $min-step or $step > $max-step {
+    @error 'Provided $step value is outside the $step-list bounds; provided #{$step}, expected -9 <= $step <= 9';
+  }
+
+  @if $step < 0 {
+    $mix-color: #000;
+    $step: $step * -1;
+  }
+
+  @return mix($color, $mix-color, 100% - $step * 10%);
+}
+
+body {
+  font-family: "Open Sans",Arial, Helvetica, sans-serif;
+}
+
+code {
+  display: inline-block;
+  background-color: #303030;
+  border-radius: .25em;
+  color: #f0f0f0;
+  padding: .125rem .25rem;
+}
+
+input {
+  display: block;
+  font-size: .9rem;
+  height: 1.65rem;
+}
+
+input, select {
+  border: none;
+  border-radius: .25rem;
+}
+
+.app-container, .compound-input {
+  display: flex;
+}
+
+.app-container {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.compound-input {
+  border: 1px solid #333;
+  border-radius: .25rem;
+  font-size: .9rem;
+  justify-content: stretch;
+  height: 1.75rem;
+}
+
+.compound-input {
+  width: 100%;
+  max-width: 600px;
+}
+
+.suggested-branch {
+  margin-top: .25rem
+}
+
+.team-id-input {
+  margin-right: .25rem;
+}
+
+.ticket-id-input {
+  margin-right: .25rem;
+  width: 100%;
+  max-width: 5.5ch;
+}
+
+.branch-input {
+  width: 100%;
+}
+
+.result-container {
+  border-radius: .25rem;
+  margin: .5rem 0 .25rem;
+  padding: .5rem;
+  width: 100%;
+  max-width: calc(600px - 1rem + 1px);
+
+  .branch-name {
+    background-color: #f7f7f7;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &.errors {
+    .result-heading {
+      color: $error;
+    }
+  }
+
+  &.warnings {
+    .result-heading {
+      color: $warning;
+    }
+  }
+
+  &.suggestions {
+    .result-heading {
+      color: green;
+    }
+  }
+}
+
+.result-heading {
+  margin: 0 auto .25rem;
+}
