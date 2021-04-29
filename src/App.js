@@ -1,8 +1,14 @@
 import React from "react";
+import { ConditionalDisplay } from "./components/ConditionalDisplay";
+import { Result } from "./components/Result";
 import { ResultContainer } from "./components/ResultContainer";
 import "./styles.scss";
-import { CRITERIA, RESULT_TYPE } from "./utils/constants";
-import { useBranchPrefix, useFilterText } from "./utils/hooks";
+import { RESULT_TYPE } from "./utils/constants";
+import {
+  useBranchPrefix,
+  useFilterText,
+  useGroupCriteriaByResultType
+} from "./utils/hooks";
 
 const TICKET_ID_MAX_LENGTH = 5;
 
@@ -13,13 +19,18 @@ export default function App() {
 
   const [branchPrefix, setTeamId, setTicketId] = useBranchPrefix({});
   const [branchName, setBranchName, matchedCriteria] = useFilterText("");
+  const {
+    errors: errorResults,
+    warnings: warningResults,
+    suggestions: suggestionResults,
+    explanations: explanationResults
+  } = useGroupCriteriaByResultType(matchedCriteria);
 
   const conditionallyFocusNextInput = (event) => {
     event.preventDefault();
 
     if (!branchPrefix.length) {
       if (teamIdSelectRef.current.value === "") {
-        console.log("select team ID");
         teamIdSelectRef.current.focus();
       } else {
         ticketIdInputRef.current.focus();
@@ -28,7 +39,7 @@ export default function App() {
   };
 
   if (matchedCriteria.length) {
-    console.log(matchedCriteria, CRITERIA["specialCharacters"]);
+    console.log(matchedCriteria);
   }
 
   return (
@@ -41,7 +52,7 @@ export default function App() {
           onInput={() => {
             setTeamId(teamIdSelectRef.current.value);
 
-            // ticketIdInputRef.current.focus();
+            ticketIdInputRef.current.focus();
           }}
         >
           <option value="" disabled>
@@ -113,22 +124,57 @@ export default function App() {
               </code>
             </p>
           </ResultContainer>
-          <ResultContainer
-            className={RESULT_TYPE.ERRORS}
-            heading="Errors"
-          ></ResultContainer>
-          <ResultContainer
-            className={RESULT_TYPE.WARNINGS}
-            heading="Warnings"
-          ></ResultContainer>
-          <ResultContainer
-            className={RESULT_TYPE.SUGGESTIONS}
-            heading="Suggestions"
-          ></ResultContainer>
+          <ConditionalDisplay test={errorResults}>
+            <ResultContainer className={RESULT_TYPE.ERRORS} heading="Errors">
+              {errorResults
+                ? Object.values(errorResults).map((errorData) => (
+                    <Result key={errorData.id} data={errorData} />
+                  ))
+                : null}
+            </ResultContainer>
+          </ConditionalDisplay>
+          <ConditionalDisplay test={warningResults}>
+            <ResultContainer
+              className={RESULT_TYPE.WARNINGS}
+              heading="Warnings"
+            >
+              {warningResults
+                ? Object.values(warningResults).map((warningData) => (
+                    <Result key={warningData.id} data={warningData} />
+                  ))
+                : null}
+            </ResultContainer>
+          </ConditionalDisplay>
+          <ConditionalDisplay test={suggestionResults}>
+            <ResultContainer
+              className={RESULT_TYPE.SUGGESTIONS}
+              heading="Suggestions"
+            >
+              {suggestionResults
+                ? Object.values(suggestionResults).map((suggestionData) => (
+                    <Result key={suggestionData.id} data={suggestionData} />
+                  ))
+                : null}
+            </ResultContainer>
+          </ConditionalDisplay>
+          <ConditionalDisplay test={explanationResults}>
+            <ResultContainer
+              className={RESULT_TYPE.EXPLANATIONS}
+              heading="Explanations"
+            >
+              {explanationResults
+                ? Object.values(explanationResults).map((explanationData) => (
+                    <Result key={explanationData.id} data={explanationData} />
+                  ))
+                : null}
+            </ResultContainer>
+          </ConditionalDisplay>
         </>
       ) : (
         <p>
-          <i>Start typing a branch name to see some suggestions :)</i>
+          <i>
+            Start typing a description to see some suggested branch names :)
+          </i>
         </p>
       )}
     </div>

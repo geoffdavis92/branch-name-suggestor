@@ -1,6 +1,7 @@
 import React from "react";
 import {
   CONSECUTIVE_DUPLICATE_WORDS,
+  CRITERIA,
   GRAMMAR,
   SPECIAL_CHARACTERS,
   WORD_SEPARATORS
@@ -204,4 +205,31 @@ export function useFilterText(text) {
   ];
 }
 
-export function useGroupByResultType(matchedCriteria) {}
+/**
+ *
+ * @param {string[]} matchedCriteria
+ */
+export function useGroupCriteriaByResultType(matchedCriteria) {
+  if (matchedCriteria.length) {
+    const criteriaProperties = matchedCriteria.reduce((props, criteriaId) => {
+      const criteriaVal = { id: criteriaId, ...CRITERIA[criteriaId] };
+
+      // Create property for resultType if it doesn't exist already
+      if (!props.hasOwnProperty(criteriaVal.resultType)) {
+        props[criteriaVal.resultType] = {};
+      }
+
+      /**
+       * Set criteria object to computed property path based on
+       *  result type and criteria ID
+       */
+      props[criteriaVal.resultType][criteriaId] = criteriaVal;
+
+      return props;
+    }, {});
+
+    return criteriaProperties;
+  } else {
+    return {};
+  }
+}
