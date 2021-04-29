@@ -2,8 +2,12 @@ import React from "react";
 import {
   CONSECUTIVE_DUPLICATE_WORDS,
   CRITERIA,
+  ENVIRONMENTS,
   GRAMMAR,
   SPECIAL_CHARACTERS,
+  SUGGESTED,
+  TICKET_TYPES,
+  UNDERSCORES,
   WORD_SEPARATORS
 } from "./constants";
 import { createFilterRegex, isTextChanged } from "./functions";
@@ -29,7 +33,7 @@ export function useBranchPrefix(branchPrefixState = {}) {
  * @param {string} text Text to send through grammar filters
  */
 export function useFilterText(text) {
-  const [textToFilter, setTextToFilter] = React.useState(text);
+  const [textToFilter, setTextToFilter] = React.useState(text.trim());
   const filterPropertiesUsed = React.useRef(new Set());
 
   /**
@@ -97,31 +101,31 @@ export function useFilterText(text) {
     },
     textNounsReplaced
   );
-  const textProperNounsReplaced = GRAMMAR.PROPER_NOUNS.values.reduce(
-    (filterText, properNoun) => {
-      const properNounRegex = createFilterRegex(properNoun);
-      const filterResult = filterText.replace(properNounRegex, "");
+  const textEnvironmentsReplaced = ENVIRONMENTS.values.reduce(
+    (filterText, environment) => {
+      const environmentRegex = createFilterRegex(environment);
+      const filterResult = filterText.replace(environmentRegex, "");
 
       if (isTextChanged(filterText, filterResult)) {
-        filterPropertiesUsed.current.add(GRAMMAR.PROPER_NOUNS.id);
+        filterPropertiesUsed.current.add(ENVIRONMENTS.id);
       }
 
       return filterResult;
     },
     textPrepositionsReplaced
   );
-  const textOtherWordsReplaced = GRAMMAR.OTHER_WORDS.values.reduce(
-    (filterText, otherWord) => {
-      const otherWordRegex = createFilterRegex(otherWord);
-      const filterResult = filterText.replace(otherWordRegex, "");
+  const textTicketTypesReplaced = TICKET_TYPES.values.reduce(
+    (filterText, ticketType) => {
+      const ticketTypeRegex = createFilterRegex(ticketType);
+      const filterResult = filterText.replace(ticketTypeRegex, "");
 
       if (isTextChanged(filterText, filterResult)) {
-        filterPropertiesUsed.current.add(GRAMMAR.OTHER_WORDS.id);
+        filterPropertiesUsed.current.add(TICKET_TYPES.id);
       }
 
       return filterResult;
     },
-    textProperNounsReplaced
+    textEnvironmentsReplaced
   );
 
   /**
@@ -140,7 +144,7 @@ export function useFilterText(text) {
 
       return filterResult;
     },
-    textOtherWordsReplaced
+    textTicketTypesReplaced
   );
 
   // Replace word-separating characters with spaces
@@ -161,9 +165,22 @@ export function useFilterText(text) {
   /**
    * Formatting based on preferred style
    */
+  const textTestedForInputUnderscores = UNDERSCORES.values.reduce(
+    (filterText, underscorePattern) => {
+      const underscoreRegex = new RegExp(underscorePattern, "gi");
+      const filterResult = underscoreRegex.test(filterText);
+
+      if (filterResult) {
+        filterPropertiesUsed.current.add(UNDERSCORES.id);
+      }
+
+      return filterText;
+    },
+    textCharForSpacesReplaced
+  );
 
   // Trim value, replace spaces with underscores
-  const textSpacesReplaced = textCharForSpacesReplaced
+  const textSpacesReplaced = textTestedForInputUnderscores
     .trim()
     .replace(/\s+/g, "_");
 
@@ -173,6 +190,7 @@ export function useFilterText(text) {
   // Remove duplicated words
   const textDuplicatedWordsRemoved = textToLowerCase
     .split("_")
+    .filter((word) => word.length)
     .map((word, i, arr) => {
       /**
        * If not the first element in the array AND if the current
@@ -190,10 +208,11 @@ export function useFilterText(text) {
       return word;
     })
     .join("_")
-    .replace(/_+/g, "_");
+    .replace(/_+/g, "_")
+    .replace(/_$/, "");
 
   // Store used filter properties in order to reset Set
-  const capturedFilterProperties = filterPropertiesUsed.current;
+  const capturedFilterProperties = Array.from(filterPropertiesUsed.current);
 
   // reset used filter properties set
   filterPropertiesUsed.current = new Set();
@@ -201,7 +220,7 @@ export function useFilterText(text) {
   return [
     textDuplicatedWordsRemoved,
     setTextToFilter,
-    Array.from(capturedFilterProperties)
+    capturedFilterProperties
   ];
 }
 
@@ -232,4 +251,44 @@ export function useGroupCriteriaByResultType(matchedCriteria) {
   } else {
     return {};
   }
+}
+
+export function useSuggestions(suggBranchName) {
+  const suggestions = React.useRef(new Set());
+
+  if (suggBranchName.length) {
+    // Split post-prefix branch name by underscores
+    const wordArray = suggBranchName.split("_");
+
+    const wordCount = wordArray.length;
+    const averageWordLength = wordArray.reduce((total, word) => {
+      const [lastWord] = wordArray.slice(-1);
+
+      total += word.length;
+
+      if (word === lastWord) {
+        total = total / wordCount;
+      }
+
+      return total;
+    }, 0);
+
+    if (wordCount <= SUGGESTED.MIN_WORD_COUNT.value) {
+      suggestions.current.add(SUGGESTED.MIN_WORD_COUNT.id);
+    }
+
+    if (wordCount > SUGGESTED.MAX_WORD_COUNT.value) {
+      suggestions.current.add(SUGGESTED.MAX_WORD_COUNT.id);
+    }
+
+    if (averageWordLength > SUGGESTED.AVG_WORD_LENGTH.value) {
+      suggestions.current.add(SUGGESTED.AVG_WORD_LENGTH.id);
+    }
+  }
+  const capturedSuggestions = Array.from(suggestions.current);
+
+  // Reset
+  suggestions.current = new Set();
+
+  return capturedSuggestions;
 }

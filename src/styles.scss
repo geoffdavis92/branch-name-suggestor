@@ -42,7 +42,7 @@ code {
   background-color: #303030;
   border-radius: .25em;
   color: #f0f0f0;
-  font-size: .75rem;
+  font-size: .9rem;
   padding: .125rem .25rem;
 }
 
@@ -82,10 +82,6 @@ input, select {
   max-width: $max-width;
 }
 
-.suggested-branch {
-  margin-top: .25rem
-}
-
 .team-id-input {
   margin-right: .25rem;
 }
@@ -113,9 +109,7 @@ input, select {
   }
 
   &.branch-name {
-    p {
-      margin: 0;
-    }
+    display: flex;
   }
 
   &.errors {
@@ -135,6 +129,12 @@ input, select {
     .result-container-heading {
       color: $success;
     }
+  }
+
+  &.perfect-branch-name {
+    background-color: $success;
+    color: #fff;
+    text-align: center;
   }
 }
 
@@ -171,8 +171,9 @@ input, select {
   }
 
   &-warnings {
-    &:before, &:after {
+    &:before {
       content: "";
+      background-color: $warning;
       border-radius: 100%;
       display: block;
       height: .5rem;
@@ -182,18 +183,44 @@ input, select {
       width: .5rem;
     }
 
-    &:before {
-      background-color: $warning;
-      z-index: 2;
+    .result-heading {
+      color: $warning;
     }
+  }
 
-    &:after {
-      background-color: variant($warning, 2);
-      z-index: 1;
+  &-suggestions {
+    &:before {
+      content: "";
+      background-color: $success;
+      border-radius: 100%;
+      display: block;
+      height: .5rem;
+      position: absolute;
+      top: .33rem;
+      left: -.9rem;
+      width: .5rem;
     }
 
     .result-heading {
-      color: $warning;
+      color: $success;
+    }
+  }
+
+  &-explanations {
+    &:before {
+      content: "";
+      background-color: #000;
+      border-radius: 100%;
+      display: block;
+      height: .5rem;
+      position: absolute;
+      top: .33rem;
+      left: -.9rem;
+      width: .5rem;
+    }
+
+    .result-heading {
+      color: #000;
     }
   }
 }
@@ -221,5 +248,16 @@ input, select {
     display: inline-block;
     font-weight: bolder;
     margin-right: .5rem;
+  }
+}
+
+.emoji {
+  $emoji-pulse-rate: .65s;
+
+  &:nth-of-type(odd) {
+    animation: $emoji-pulse-rate dot-pulse infinite alternate;
+  }
+  &:nth-of-type(even) {
+    animation: $emoji-pulse-rate dot-pulse infinite alternate-reverse $emoji-pulse-rate;
   }
 }

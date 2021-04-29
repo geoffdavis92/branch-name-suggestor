@@ -19,3 +19,15 @@ export const createFilterRegex = (word) => new RegExp(`\\b${word}\\b`, "gi");
 export const isTextChanged = (initialText, filteredText) => {
   return initialText !== filteredText;
 };
+
+export const setupDebounce = function setupDebouncedFn(fn, time = 500) {
+  let timeout;
+
+  return function callDebouncedFn(...args) {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      fn(...args);
+    }, time);
+  };
+};

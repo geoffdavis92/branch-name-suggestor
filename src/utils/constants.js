@@ -6,13 +6,54 @@ export const RESULT_TYPE = {
 };
 
 export const SUGGESTED = {
-  AVG_WORD_LENGTH: 8,
-  MAX_WORD_COUNT: 5
+  AVG_WORD_LENGTH: {
+    id: "averageWordLength",
+    value: 7,
+    resultType: RESULT_TYPE.SUGGESTIONS,
+    resultHeading: "Try abbreviating words",
+    resultContent: [
+      "Branch names, like variables and properties in code, can be abbreviated when desired",
+      "Feel free to shorten longer words with thoughtful abbreviations to keep branch names short and sweet"
+    ]
+  },
+  MIN_WORD_COUNT: {
+    id: "minWordCount",
+    value: 2,
+    resultType: RESULT_TYPE.WARNINGS,
+    resultHeading: "Use more words"
+  },
+  MAX_WORD_COUNT: {
+    id: "maxWordCount",
+    value: 5,
+    resultType: RESULT_TYPE.SUGGESTIONS,
+    resultHeading: "Try using fewer words",
+    resultContent: [
+      "Branch names do not need to be very long",
+      "Shorter branch names allow for easier recall and typing",
+      "Try using 5 or fewer words"
+    ]
+  }
 };
 
 export const CONSECUTIVE_DUPLICATE_WORDS = {
   id: "consecutiveDuplicateWords",
-  resultType: RESULT_TYPE.ERRORS
+  resultType: RESULT_TYPE.ERRORS,
+  resultHeading: "Duplicated word",
+  resultContent: [
+    "Consecutively repeated words should be removed",
+    "This may be a mistake, or a result of branch auto-formatting"
+  ]
+};
+
+export const ENVIRONMENTS = {
+  id: "environments",
+  values: ["environment", "Production", "Prod", "Development", "Dev", "QA"],
+  resultType: RESULT_TYPE.WARNINGS,
+  resultHeading: "Avoid using environment names",
+  resultContent: [
+    "Code that is merged into the master branch will reach all environments, from local to production",
+    "It is more important to describe the work that will be done, not the environment a bug/change is needed in"
+  ]
 };
 
 export const GRAMMAR = {
@@ -27,7 +68,7 @@ export const GRAMMAR = {
     ]
   },
   CONJUNCTIONS: {
-    id: "conjunctions",
+    id: "fillerWords",
     values: [
       "whenever",
       "because",
@@ -56,33 +97,34 @@ export const GRAMMAR = {
     resultHeading: "Avoid using nouns",
     resultContent: [
       "Nouns typically refer to a person/group of people/team, which is not needed in a branch name",
-      "The implication of creating a branch is that this impacts you/your team",
-      'If there is an impact to some "other" entity, it does not necessarily have to be mentioned in a branch name'
+      "Sometimes, this can be confusing as there is no clear subject that is being addressed",
+      "The implication of creating a branch is that this impacts you, your team, or your application"
     ]
-  },
-  OTHER_WORDS: {
-    id: "ticketTypes",
-    values: ["spike", "story", "bug"],
-    resultType: RESULT_TYPE.WARNINGS,
-    resultHeading: "Filler words"
   },
   PHRASES: { id: "phrases", values: ["based on"] },
   PREPOSITIONS: {
-    id: "prepositions",
+    id: "fillerWords",
     values: ["before", "towards", "under", "with", "in", "on", "to", "is"],
     resultType: RESULT_TYPE.WARNINGS,
-    resultHeading: "Prepositions add bloat",
+    resultHeading: "Unnecessary filler words",
     resultContent: [
-      "Most times, branch names to not need to describe relationships between 2 things",
-      'Words such as "in", "on", "to", "is" can be safely removed and the meaning can still be conveyed'
+      "Conjunctions, prepositions, and other non-technical/identifying words are not necessary in branch names",
+      "These types of words can be safely removed and the meaning can still be conveyed",
+      "This prevents unnecessarily long/verbose branch names, and makes it easier to both remember and type out"
+    ],
+    resultExamples: [
+      "unless",
+      "than",
+      "and",
+      "for",
+      "yet",
+      "so",
+      "or",
+      "before",
+      "with",
+      "in",
+      "on"
     ]
-  },
-  PROPER_NOUNS: {
-    id: "properNouns",
-    values: ["My Supporter Account", "Prod", "Dev", "QA"],
-    resultType: RESULT_TYPE.WARNINGS,
-    resultHeading: "Avoid using proper nouns",
-    resultContent: [""]
   }
 };
 
@@ -97,9 +139,32 @@ export const SPECIAL_CHARACTERS = {
   ]
 };
 
+export const TICKET_TYPES = {
+  id: "ticketTypes",
+  values: ["spike", "story", "bug"],
+  resultType: RESULT_TYPE.WARNINGS,
+  resultHeading: "Avoid mentioning ticket types",
+  resultContent: [
+    "Branches don't need to discriminate between ticket types",
+    "The ticket ID prefixing the branch name provides a link to the specific ticket where this can be seen"
+  ]
+};
+
+export const UNDERSCORES = {
+  id: "underscores",
+  values: ["[ ]"],
+  resultType: RESULT_TYPE.EXPLANATIONS,
+  resultHeading: "Underscores in branch names",
+  resultContent: [
+    "Underscores are used to space out branch names, after the team/ticket ID prefix",
+    "If a branch has to be copy/pasted, one can simply double click on the branch name to select the full text",
+    "Underscores are automatically added for spaces and certain other characters, and consecutive underscores are replaced with a single underscore character"
+  ]
+};
+
 export const WORD_SEPARATORS = {
   id: "wordSeparators",
-  values: ["[-/_ ]"],
+  values: ["[-/]"],
   resultType: RESULT_TYPE.EXPLANATIONS,
   resultHeading: "Special characters replaced with underscores",
   resultContent: [
@@ -110,8 +175,12 @@ export const WORD_SEPARATORS = {
 
 export const CRITERIA = [
   CONSECUTIVE_DUPLICATE_WORDS,
+  ENVIRONMENTS,
   ...Object.values(GRAMMAR),
   SPECIAL_CHARACTERS,
+  ...Object.values(SUGGESTED),
+  TICKET_TYPES,
+  UNDERSCORES,
   WORD_SEPARATORS
 ].reduce((criteriaMap, constant) => {
   const { id, ...restConstant } = constant;

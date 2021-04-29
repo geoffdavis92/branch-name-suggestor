@@ -4,10 +4,12 @@ import { Result } from "./components/Result";
 import { ResultContainer } from "./components/ResultContainer";
 import "./styles.scss";
 import { RESULT_TYPE } from "./utils/constants";
+import { setupDebounce } from "./utils/functions";
 import {
   useBranchPrefix,
   useFilterText,
-  useGroupCriteriaByResultType
+  useGroupCriteriaByResultType,
+  useSuggestions
 } from "./utils/hooks";
 
 const TICKET_ID_MAX_LENGTH = 5;
@@ -18,13 +20,15 @@ export default function App() {
   const branchInputRef = React.createRef();
 
   const [branchPrefix, setTeamId, setTicketId] = useBranchPrefix({});
-  const [branchName, setBranchName, matchedCriteria] = useFilterText("");
+  const [filteredText, setTextToFilter, matchedCriteria] = useFilterText("");
+  const suggestions = useSuggestions(filteredText);
+  const debouncedSetTextToFilter = setupDebounce(setTextToFilter);
   const {
     errors: errorResults,
     warnings: warningResults,
     suggestions: suggestionResults,
     explanations: explanationResults
-  } = useGroupCriteriaByResultType(matchedCriteria);
+  } = useGroupCriteriaByResultType([...matchedCriteria, ...suggestions]);
 
   const conditionallyFocusNextInput = (event) => {
     event.preventDefault();
@@ -37,10 +41,6 @@ export default function App() {
       }
     }
   };
-
-  if (matchedCriteria.length) {
-    console.log(matchedCriteria);
-  }
 
   return (
     <div className="app-container">
@@ -90,7 +90,7 @@ export default function App() {
           className="input branch-input"
           placeholder="Describe what you'll do in this branch…"
           onInput={() => {
-            setBranchName(branchInputRef.current.value);
+            debouncedSetTextToFilter(branchInputRef.current.value);
           }}
           onKeyDown={(keyDownEvent) => {
             switch (keyDownEvent.code) {
@@ -113,17 +113,30 @@ export default function App() {
           }}
         />
       </div>
-      {branchPrefix.length && branchName.length ? (
+      {branchPrefix.length && filteredText.length ? (
         <>
           <ResultContainer className="branch-name">
-            <p>
-              Suggested branch name:
-              <br />
-              <code className="suggested-branch">
-                {branchPrefix}/{branchName}
-              </code>
-            </p>
+            <code className="suggested-branch">
+              {branchPrefix}/{filteredText}
+            </code>
           </ResultContainer>
+          <ConditionalDisplay
+            test={!errorResults && !warningResults && !suggestionResults}
+          >
+            <ResultContainer className="perfect-branch-name">
+              <span className="emoji" role="img" aria-label="sparkles emoji">
+                ✨
+              </span>{" "}
+              Looks like you crafted a fantastic branch name{" "}
+              <span
+                className="emoji"
+                role="img"
+                aria-label="party buzzer emoji"
+              >
+                ✨
+              </span>
+            </ResultContainer>
+          </ConditionalDisplay>
           <ConditionalDisplay test={errorResults}>
             <ResultContainer className={RESULT_TYPE.ERRORS} heading="Errors">
               {errorResults
