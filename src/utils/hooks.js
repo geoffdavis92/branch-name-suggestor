@@ -42,7 +42,7 @@ export function useFilterText(text) {
   const textPhrasesReplaced = GRAMMAR.PHRASES.values.reduce(
     (filterText, phrase) => {
       const phraseRegex = createFilterRegex(phrase);
-      const filterResult = filterText.replace(phraseRegex, "");
+      const filterResult = filterText.replace(phraseRegex, "_");
 
       if (isTextChanged(filterText, filterResult)) {
         filterPropertiesUsed.current.add(GRAMMAR.PHRASES.id);
@@ -55,7 +55,7 @@ export function useFilterText(text) {
   const textArticlesReplaced = GRAMMAR.ARTICLES.values.reduce(
     (filterText, article) => {
       const articleRegex = createFilterRegex(article);
-      const filterResult = filterText.replace(articleRegex, "");
+      const filterResult = filterText.replace(articleRegex, "_");
 
       if (isTextChanged(filterText, filterResult)) {
         filterPropertiesUsed.current.add(GRAMMAR.ARTICLES.id);
@@ -68,7 +68,7 @@ export function useFilterText(text) {
   const textConjunctionsReplaced = GRAMMAR.CONJUNCTIONS.values.reduce(
     (filterText, conjunction) => {
       const conjunctionRegex = createFilterRegex(conjunction);
-      const filterResult = filterText.replace(conjunctionRegex, "");
+      const filterResult = filterText.replace(conjunctionRegex, "_");
 
       if (isTextChanged(filterText, filterResult)) {
         filterPropertiesUsed.current.add(GRAMMAR.CONJUNCTIONS.id);
@@ -80,7 +80,7 @@ export function useFilterText(text) {
   );
   const textNounsReplaced = GRAMMAR.NOUNS.values.reduce((filterText, noun) => {
     const nounRegex = createFilterRegex(noun);
-    const filterResult = filterText.replace(nounRegex, "");
+    const filterResult = filterText.replace(nounRegex, "_");
 
     if (isTextChanged(filterText, filterResult)) {
       filterPropertiesUsed.current.add(GRAMMAR.NOUNS.id);
@@ -91,7 +91,7 @@ export function useFilterText(text) {
   const textPrepositionsReplaced = GRAMMAR.PREPOSITIONS.values.reduce(
     (filterText, preposition) => {
       const prepositionRegex = createFilterRegex(preposition);
-      const filterResult = filterText.replace(prepositionRegex, "");
+      const filterResult = filterText.replace(prepositionRegex, "_");
 
       if (isTextChanged(filterText, filterResult)) {
         filterPropertiesUsed.current.add(GRAMMAR.PREPOSITIONS.id);
@@ -104,7 +104,7 @@ export function useFilterText(text) {
   const textEnvironmentsReplaced = ENVIRONMENTS.values.reduce(
     (filterText, environment) => {
       const environmentRegex = createFilterRegex(environment);
-      const filterResult = filterText.replace(environmentRegex, "");
+      const filterResult = filterText.replace(environmentRegex, "_");
 
       if (isTextChanged(filterText, filterResult)) {
         filterPropertiesUsed.current.add(ENVIRONMENTS.id);
@@ -117,7 +117,7 @@ export function useFilterText(text) {
   const textTicketTypesReplaced = TICKET_TYPES.values.reduce(
     (filterText, ticketType) => {
       const ticketTypeRegex = createFilterRegex(ticketType);
-      const filterResult = filterText.replace(ticketTypeRegex, "");
+      const filterResult = filterText.replace(ticketTypeRegex, "_");
 
       if (isTextChanged(filterText, filterResult)) {
         filterPropertiesUsed.current.add(TICKET_TYPES.id);
@@ -136,7 +136,7 @@ export function useFilterText(text) {
   const textSpecialCharactersRemoved = SPECIAL_CHARACTERS.values.reduce(
     (filterText, specialCharPattern) => {
       const specialCharRegex = new RegExp(specialCharPattern, "gi");
-      const filterResult = filterText.replace(specialCharRegex, "");
+      const filterResult = filterText.replace(specialCharRegex, "_");
 
       if (isTextChanged(filterText, filterResult)) {
         filterPropertiesUsed.current.add(SPECIAL_CHARACTERS.id);
@@ -273,7 +273,7 @@ export function useSuggestions(suggBranchName) {
       return total;
     }, 0);
 
-    if (wordCount <= SUGGESTED.MIN_WORD_COUNT.value) {
+    if (wordCount < SUGGESTED.MIN_WORD_COUNT.value) {
       suggestions.current.add(SUGGESTED.MIN_WORD_COUNT.id);
     }
 

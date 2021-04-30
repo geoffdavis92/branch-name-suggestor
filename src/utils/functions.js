@@ -14,7 +14,8 @@ export const camelCaseToDashCase = (identifier) => {
   return dashCaseId;
 };
 
-export const createFilterRegex = (word) => new RegExp(`\\b${word}\\b`, "gi");
+export const createFilterRegex = (word) =>
+  new RegExp(`[\\b_ ]${word}[\\b_ ]`, "gi");
 
 export const isTextChanged = (initialText, filteredText) => {
   return initialText !== filteredText;

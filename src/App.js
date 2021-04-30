@@ -15,8 +15,11 @@ import {
 const TICKET_ID_MAX_LENGTH = 5;
 
 export default function App() {
+  const teamIdLabelRef = React.createRef();
   const teamIdSelectRef = React.createRef();
+  const ticketIdLabelRef = React.createRef();
   const ticketIdInputRef = React.createRef();
+  const branchLabelRef = React.createRef();
   const branchInputRef = React.createRef();
 
   const [branchPrefix, setTeamId, setTicketId] = useBranchPrefix({});
@@ -31,12 +34,14 @@ export default function App() {
   } = useGroupCriteriaByResultType([...matchedCriteria, ...suggestions]);
 
   const conditionallyFocusNextInput = (event) => {
-    event.preventDefault();
-
     if (!branchPrefix.length) {
       if (teamIdSelectRef.current.value === "") {
+        event.preventDefault();
+
         teamIdSelectRef.current.focus();
       } else {
+        event.preventDefault();
+
         ticketIdInputRef.current.focus();
       }
     }
@@ -45,73 +50,108 @@ export default function App() {
   return (
     <div className="app-container">
       <div className="compound-input">
-        <select
-          ref={teamIdSelectRef}
-          defaultValue=""
-          className="input team-id-input"
-          onInput={() => {
-            setTeamId(teamIdSelectRef.current.value);
+        <div className="input-wrap">
+          <label ref={teamIdLabelRef} for="team-id" className="label">
+            Team
+          </label>
+          <select
+            ref={teamIdSelectRef}
+            defaultValue=""
+            id="team-id"
+            className="input team-id-input"
+            onFocus={() => {
+              teamIdLabelRef.current.classList.add("focus");
+            }}
+            onInput={() => {
+              setTeamId(teamIdSelectRef.current.value);
 
-            ticketIdInputRef.current.focus();
-          }}
-        >
-          <option value="" disabled>
-            Select…
-          </option>
-          <option value="CARE">CARE</option>
-        </select>
-        <input
-          ref={ticketIdInputRef}
-          type="tel"
-          maxLength={TICKET_ID_MAX_LENGTH}
-          className="input ticket-id-input"
-          placeholder="123"
-          onKeyDown={({ code }) => {
-            if (code === "Space" && ticketIdInputRef.current.value.length) {
-              branchInputRef.current.focus();
-            }
-          }}
-          onInput={() => {
-            setTicketId(ticketIdInputRef.current.value);
-
-            if (
-              ticketIdInputRef.current.value.length === TICKET_ID_MAX_LENGTH
-            ) {
-              branchInputRef.current.focus();
-            }
-          }}
-          onBlur={() => {
-            ticketIdInputRef.current.value.trim();
-          }}
-        />
-        <input
-          ref={branchInputRef}
-          type="text"
-          className="input branch-input"
-          placeholder="Describe what you'll do in this branch…"
-          onInput={() => {
-            debouncedSetTextToFilter(branchInputRef.current.value);
-          }}
-          onKeyDown={(keyDownEvent) => {
-            switch (keyDownEvent.code) {
-              case "Escape":
-              case "Enter":
-              case "Tab": {
-                /**
-                 * If any coded-key is pressed, conditionally focus on
-                 *  the next input that needs a valid value
-                 */
-                conditionallyFocusNextInput(keyDownEvent);
-
-                break;
+              ticketIdInputRef.current.focus();
+            }}
+            onBlur={() => {
+              teamIdLabelRef.current.classList.remove("focus");
+            }}
+          >
+            <option value="" disabled>
+              Select…
+            </option>
+            <option value="CARE">CARE</option>
+          </select>
+        </div>
+        <div className="input-wrap">
+          <label ref={ticketIdLabelRef} for="ticket-id" className="label">
+            Ticket
+          </label>
+          <input
+            ref={ticketIdInputRef}
+            type="tel"
+            id="ticket-id"
+            className="input ticket-id-input"
+            placeholder="123"
+            maxLength={TICKET_ID_MAX_LENGTH}
+            onFocus={() => {
+              ticketIdLabelRef.current.classList.add("focus");
+            }}
+            onKeyDown={({ code }) => {
+              if (code === "Space" && ticketIdInputRef.current.value.length) {
+                branchInputRef.current.focus();
               }
-              default: {
-                // no-op
-                return;
+            }}
+            onInput={() => {
+              setTicketId(ticketIdInputRef.current.value);
+
+              if (
+                ticketIdInputRef.current.value.length === TICKET_ID_MAX_LENGTH
+              ) {
+                branchInputRef.current.focus();
               }
-            }
-          }}
-        />
+            }}
+            onBlur={() => {
+              ticketIdLabelRef.current.classList.remove("focus");
+              ticketIdInputRef.current.value.trim();
+            }}
+          />
+        </div>
+        <div className="input-wrap">
+          <label ref={branchLabelRef} for="branch-desc" className="label">
+            Branch description
+          </label>
+          <input
+            ref={branchInputRef}
+            type="text"
+            id="branch-desc"
+            className="input branch-input"
+            placeholder="Describe what you'll do in this branch…"
+            onFocus={() => {
+              branchLabelRef.current.classList.add("focus");
+            }}
+            onInput={() => {
+              debouncedSetTextToFilter(branchInputRef.current.value);
+            }}
+            onKeyDown={(keyDownEvent) => {
+              switch (keyDownEvent.code) {
+                case "Escape":
+                case "Enter":
+                case "Tab": {
+                  /**
+                   * If any coded-key is pressed, conditionally focus on
+                   *  the next input that needs a valid value
+                   */
+                  conditionallyFocusNextInput(keyDownEvent);
+
+                  break;
+                }
+                default: {
+                  // no-op
+                  return;
+                }
+              }
+            }}
+            onBlur={() => {
+              branchLabelRef.current.classList.remove("focus");
+              branchInputRef.current.value.trim();
+            }}
+          />
+        </div>
       </div>
       {branchPrefix.length && filteredText.length ? (
         <>

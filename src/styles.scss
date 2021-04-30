@@ -75,6 +75,33 @@ input, select {
   font-size: .9rem;
   justify-content: stretch;
   height: 1.75rem;
+  margin: 2rem 0 0
+}
+
+.input-wrap {
+  display: flex;
+  position: relative;
+
+  &:nth-of-type(2) {
+    width: 100%;
+    max-width: 6.25ch;
+  }
+
+  &:nth-of-type(3) {
+    width: 100%;
+  }
+}
+
+.label{
+  color: variant(#000,7);
+  font-size: .8rem;
+  position: absolute;
+  top: -1.125rem;
+  transition: .2s color;
+
+  &.focus {
+    color: #000;
+  }
 }
 
 .compound-input {
@@ -89,7 +116,6 @@ input, select {
 .ticket-id-input {
   margin-right: .25rem;
   width: 100%;
-  max-width: 5.5ch;
 }
 
 .branch-input {

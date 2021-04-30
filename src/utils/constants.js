@@ -130,9 +130,9 @@ export const GRAMMAR = {
 
 export const SPECIAL_CHARACTERS = {
   id: "specialCharacters",
-  values: ["[–—\":“‘’”'!?()\\[\\].,\\\\]"],
+  values: ["[^a-zA-Z0-9 _\\/-]"],
   resultType: RESULT_TYPE.ERRORS,
-  resultHeading: "Special characters",
+  resultHeading: "Disallowed characters",
   resultContent: [
     "You should only use letters and numbers in branch names",
     "Some special characters will cause unwanted behavior in the command line"
@@ -158,17 +158,17 @@ export const UNDERSCORES = {
   resultContent: [
     "Underscores are used to space out branch names, after the team/ticket ID prefix",
     "If a branch has to be copy/pasted, one can simply double click on the branch name to select the full text",
-    "Underscores are automatically added for spaces and certain other characters, and consecutive underscores are replaced with a single underscore character"
+    'Spaces (" ") and consecutive underscores are replaced with a single underscore character'
   ]
 };
 
 export const WORD_SEPARATORS = {
   id: "wordSeparators",
-  values: ["[-/]"],
+  values: ["[-]"],
   resultType: RESULT_TYPE.EXPLANATIONS,
   resultHeading: "Special characters replaced with underscores",
   resultContent: [
-    'Dashes ("-"), forward slashes ("/"), and spaces (" ") are replaced with underscores',
+    'Dashes ("-") and forward slashes ("/") are replaced with underscores',
     "This maintains consistency across branch names, and prevents unwanted behavior when creating a branch name with characters unsupported by a CLI"
   ]
 };
